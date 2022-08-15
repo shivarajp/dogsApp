@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/FirstFragment">
+
+    <fragment
+        android:id="@+id/FirstFragment"
+        android:name="com.shapegames.animals.views.home.HomeFragment"
+        android:label="@string/first_fragment_label"
+        tools:layout="@layout/home_fragment">
+
+        <action
+            android:id="@+id/action_FirstFragment_to_SecondFragment"
+            app:destination="@id/SecondFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_pop_exit_anim"
+
+            />
+        <action
+            android:id="@+id/action_FirstFragment_to_likedDogsFragment"
+            app:destination="@id/likedDogsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/SecondFragment"
+        android:name="com.shapegames.animals.views.dogslist.DogsDetailsFragment"
+        android:label="@string/second_fragment_label"
+        tools:layout="@layout/dog_details_fragment">
+
+        <action
+            android:id="@+id/action_SecondFragment_to_FirstFragment"
+            app:destination="@id/FirstFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_pop_exit_anim"
+            />
+        <argument
+            android:name="breed_id"
+            app:argType="long" />
+        <argument
+            android:name="sub_breed_id"
+            app:argType="long" />
+        <action
+            android:id="@+id/action_SecondFragment_to_likedDogsFragment"
+            app:destination="@id/likedDogsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/likedDogsFragment"
+        android:name="com.shapegames.animals.views.favorites.LikedDogsFragment"
+        android:label="fragment_liked_dogs"
+        tools:layout="@layout/fragment_liked_dogs" />
+</navigation>

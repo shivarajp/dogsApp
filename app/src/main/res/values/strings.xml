@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Shape Cute Dogs</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="first_fragment_label">Home</string>
+    <string name="second_fragment_label">Dog Details</string>
+
+    <string name="category_title">Dog Breeds</string>
+    <string name="liked_dogs">Liked Dogs</string>
+    <string name="category_message">Choose your favourite breed</string>
+    <string name="like_hint_msg">Tap on image to like it</string>
+    <string name="filter_hint">Tap on breed name to filter</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
+</resources>

@@ -7,12 +7,6 @@ import com.shapegames.animals.data.models.DogsByBreedResponseModel
 @Dao
 interface DogsDao {
 
-    /*@Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insetDogs(dogs: MutableList<DogDetails>)
-
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insetBreeds(breeds: MutableList<Breeds>)*/
-
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insetBreed(breeds: Breeds): Long
 
@@ -30,9 +24,7 @@ interface DogsDao {
     @Query("select COUNT(*) from DOG_DETAILS where breedid == :breedId")
     fun isThisBreedImagesAreInDB(breedId: Long): Int
 
-    /*@Query("select * from DOG_DETAILS where breedid == :breedId")
-    fun getDogsByBreedId(breedId: Long): LiveData<MutableList<DogDetails>>
-*/
+
     @Query(
         "select d.dog_id, d.dog_url," +
                 " d.breedid, d.is_liked, b.breed_name " +

@@ -10,12 +10,15 @@ import com.shapegames.animals.data.local.DogsDao
 import com.shapegames.animals.data.remote.DogsAPI
 import com.shapegames.animals.data.remote.Resource
 import com.shapegames.animals.data.remote.ResponseHandler
+import com.shapegames.animals.utils.Util
 import com.shapegames.animals.utils.Util.IMG_COUNT
 import com.shapegames.animals.utils.Util.UNLIKED
 import com.shapegames.animals.utils.Util.dogsBreedsHashMap
+import com.shapegames.animals.utils.Util.imageUrls
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.*
 import javax.inject.Inject
 
 class DogsRepositoryImpl
@@ -123,17 +126,18 @@ class DogsRepositoryImpl
     fun saveLocalBreedsInDB(): LiveData<Resource<String>> {
         return liveData(Dispatchers.IO) {
             try {
+                val rand = Random()
+
                 emit(Resource.loading(null))
 
                 if (dao.getAllBreedNamesCount() <= 0) {
                     dogsBreedsHashMap.keys.forEachIndexed { index, key ->
-
-                        saveBreedWithImg(key, "")
+                        saveBreedWithImg(key, imageUrls[rand.nextInt(10)])
                         emit(responseHandler.handleSuccess("$index"))
 
                         /**
                          * We can fetch a random image for each breed
-                         * to load in the breed list.
+                         * to load in the breed list for better user experience.
                          * As of now keeping it simple with static image.
                          */
 

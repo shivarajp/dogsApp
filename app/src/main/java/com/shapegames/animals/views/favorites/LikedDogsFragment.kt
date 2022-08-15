@@ -61,7 +61,7 @@ class LikedDogsFragment : Fragment() {
         binding.likedDogsRv.adapter = adapter
 
         binding.breedsHorizontalRv.layoutManager =
-            LinearLayoutManager(requireActivity(), LinearLayoutManager.HORIZONTAL, true)
+            LinearLayoutManager(requireActivity(), LinearLayoutManager.HORIZONTAL, false)
         binding.breedsHorizontalRv.adapter = breedAdapter
 
         viewModel.getAllLikedDogs().observe(viewLifecycleOwner, Observer {
@@ -82,6 +82,7 @@ class LikedDogsFragment : Fragment() {
                 dogsList.clear()
                 dogsList.addAll(it)
                 adapter.notifyDataSetChanged()
+
 
                 if (it.isEmpty()) {
                     binding.noDogsTv.show()

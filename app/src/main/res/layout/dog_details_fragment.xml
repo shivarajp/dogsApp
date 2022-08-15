@@ -40,7 +40,7 @@
         android:textColor="@color/colorPrimary"
         android:textSize="24sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/categories_message"
+        app:layout_constraintBottom_toBottomOf="@+id/breed_title"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/breed_title"
         app:tint="@android:color/white" />

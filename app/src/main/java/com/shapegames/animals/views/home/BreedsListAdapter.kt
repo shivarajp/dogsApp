@@ -28,7 +28,7 @@ class BreedsListAdapter(private val list: MutableList<Breeds>) :
         with(holder.viewItem) {
             with(list[position]) {
                 breedDogTitle.text = this.breedName
-                breedDogImg.load()
+                breedDogImg.load(this.imgUrl)
             }
         }
 

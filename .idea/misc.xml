@@ -3,9 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.164" />
         <entry key="app/src/main/res/drawable/arrow_left_thin.xml" value="0.1865" />
         <entry key="app/src/main/res/drawable/cards_heart.xml" value="0.1865" />
         <entry key="app/src/main/res/drawable/cards_heart_outline.xml" value="0.1865" />
+        <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.164" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.26875" />
         <entry key="app/src/main/res/layout/all_breeds_row_item.xml" value="0.26927083333333335" />
         <entry key="app/src/main/res/layout/breed_row_item.xml" value="0.2615306639635073" />
@@ -17,6 +19,8 @@
         <entry key="app/src/main/res/layout/fragment_second.xml" value="0.26875" />
         <entry key="app/src/main/res/layout/home_fragment.xml" value="0.25" />
         <entry key="app/src/main/res/layout/liked_dogs_row_item.xml" value="0.26927083333333335" />
+        <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.164" />
+        <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.164" />
       </map>
     </option>
   </component>

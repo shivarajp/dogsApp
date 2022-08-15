@@ -6,6 +6,7 @@ object Util {
     const val UNLIKED: Boolean = false
     const val MINIMUM_ID: Int = 0
     const val GRID_COUNT: Int = 2
+    const val BREED_GRID_COUNT: Int = 2
     const val MAX_PERCENTAGE: Int = 100
 
     const val IMG_COUNT: String = "100"

@@ -37,6 +37,12 @@ class LikedDogsListAdapter(
                 imageView.load(this.dogUrl)
             }
         }
+
+        /**
+         * We can provide like/unlike feature here as well
+         * so that user don't have to go back to unlike a dog
+         * Keeping it simple for now
+         */
     }
 
     override fun getItemCount(): Int {

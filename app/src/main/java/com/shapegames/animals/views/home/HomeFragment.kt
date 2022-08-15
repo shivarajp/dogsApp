@@ -16,6 +16,7 @@ import com.shapegames.animals.R
 import com.shapegames.animals.data.local.Breeds
 import com.shapegames.animals.data.remote.Status
 import com.shapegames.animals.databinding.HomeFragmentBinding
+import com.shapegames.animals.utils.Util.BREED_GRID_COUNT
 import com.shapegames.animals.utils.Util.MAX_PERCENTAGE
 import com.shapegames.animals.utils.hide
 import com.shapegames.animals.utils.show
@@ -76,7 +77,7 @@ class HomeFragment : Fragment() {
 
     private fun setUpViews() {
         //adapter = BreedsListAdapter(breedsList)
-        binding.breedsRv.layoutManager = GridLayoutManager(requireActivity(), 2)
+        binding.breedsRv.layoutManager = GridLayoutManager(requireActivity(), BREED_GRID_COUNT)
     }
 
     private fun saveBreeds() {

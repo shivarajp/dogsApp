@@ -56,6 +56,7 @@ class MainActivityTest {
     @Test
     fun test_home_fragment() {
 
+        sleep(1000)
         onView(withText("Dog Breeds"))
             .check(matches(isDisplayed()))
 
@@ -149,7 +150,7 @@ class MainActivityTest {
     @Test
     fun test_dog_details_fragment() {
 
-        sleep(100)
+        sleep(1000)
 
         assertListNotEmpty(R.id.breedsRv)
 

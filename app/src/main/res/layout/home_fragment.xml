@@ -7,6 +7,31 @@
     android:background="@color/colorBackground"
     tools:context=".views.home.HomeFragment">
 
+
+    <com.google.android.material.circularreveal.cardview.CircularRevealCardView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="@dimen/dp24"
+        app:cardCornerRadius="@dimen/dp24"
+        app:layout_constraintBottom_toBottomOf="@+id/categories_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/categories_title">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_launcher"
+                />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.circularreveal.cardview.CircularRevealCardView>
+
     <ImageView
         android:id="@+id/likedDogsIv"
         android:layout_width="32dp"
@@ -47,7 +72,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/categories_message"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
@@ -68,7 +93,7 @@
         android:id="@+id/breedsRv"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_margin="@dimen/side_margin"
+        android:layout_marginTop="@dimen/dp8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

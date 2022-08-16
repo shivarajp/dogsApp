@@ -15,6 +15,8 @@ import com.shapegames.animals.data.remote.Status
 import com.shapegames.animals.data.repo.DogsRepositoryImpl
 import com.shapegames.animals.getOrAwaitValue
 import com.shapegames.animals.observeForTesting
+import com.shapegames.animals.views.home.DataManager.getBreedsList
+import com.shapegames.animals.views.home.DataManager.getDogDetailsObjectList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 
@@ -95,28 +97,14 @@ class HomeViewModelTest {
 
     @Test
     fun getAllBreedsFromLocal() {
-
         val list = MutableLiveData<MutableList<Breeds>>()
-        val list2 = mutableListOf<Breeds>()
-        val breed = Breeds(
-            breedName = "australian",
-            subBreedName = "shepherd",
-            imgUrl = "https://github.com/"
-        )
-        val breed2 = Breeds(
-            breedName = "australian",
-            subBreedName = "shepherd",
-            imgUrl = "https://github.com/"
-        )
-        list2.add(breed)
-        list2.add(breed2)
 
         runTest {
             Mockito.`when`(
                 repository.getAllBreedsFromLocalDb()
             ).thenReturn(list)
         }
-        list.value = list2
+        list.value = getBreedsList()
 
         val data = viewModel.getAllBreedsFromLocal().getOrAwaitValue()
 
@@ -125,27 +113,23 @@ class HomeViewModelTest {
         Truth.assertThat(data.size).isEqualTo(2)
     }
 
+
+
     @Test
     fun insertLikedDog() {
         val result = MutableLiveData<String>()
-        val dog = DogDetails(
-            dogId = 2323,
-            dogUrl = "https://github.com/",
-            isLiked = true,
-            breedName = "australian",
-            subBreed = "shepherd"
-        )
+        val dogs = getDogDetailsObjectList()
 
         runTest {
             Mockito.`when`(
-                repository.insertLikedDog(dog)
+                repository.insertLikedDog(dogs[0])
             ).thenReturn(result)
         }
         result.value = "updated"
 
-        val data = viewModel.insertLikedDog(dog).getOrAwaitValue()
+        val data = viewModel.insertLikedDog(dogs[0]).getOrAwaitValue()
 
-        Mockito.verify(repository, times(1)).insertLikedDog(dog)
+        Mockito.verify(repository, times(1)).insertLikedDog(dogs[0])
 
         Truth.assertThat(data).isEqualTo("updated")
     }
@@ -154,30 +138,13 @@ class HomeViewModelTest {
     fun getAllLikedDogs() {
 
         val result = MutableLiveData<MutableList<DogDetails>>()
-        val list = mutableListOf<DogDetails>()
-        val dog = DogDetails(
-            dogId = 2323,
-            dogUrl = "https://github.com/",
-            isLiked = true,
-            breedName = "australian",
-            subBreed = "shepherd"
-        )
-        val dog2 = DogDetails(
-            dogId = 23223,
-            dogUrl = "https://github.com/2",
-            isLiked = true,
-            breedName = "australian",
-            subBreed = "shepherd"
-        )
-        list.add(dog)
-        list.add(dog2)
 
         runTest {
             Mockito.`when`(
                 repository.getAllLikedDogs()
             ).thenReturn(result)
         }
-        result.value = list
+        result.value = getDogDetailsObjectList()
 
         val data = viewModel.getAllLikedDogs().getOrAwaitValue()
 
@@ -190,26 +157,9 @@ class HomeViewModelTest {
     fun getLikedDogsByBreedNameAndSubBreed() {
 
         val result = MutableLiveData<MutableList<DogDetails>>()
-        val list = mutableListOf<DogDetails>()
+
         val breedName = "australian"
         val subBreedName = "shepherd"
-
-        val dog = DogDetails(
-            dogId = 2323,
-            dogUrl = "https://github.com/",
-            isLiked = true,
-            breedName = "australian",
-            subBreed = "shepherd"
-        )
-        val dog2 = DogDetails(
-            dogId = 23223,
-            dogUrl = "https://github.com/2",
-            isLiked = true,
-            breedName = "australian",
-            subBreed = "shepherd"
-        )
-        list.add(dog)
-        list.add(dog2)
 
         runTest {
             Mockito.`when`(
@@ -219,7 +169,7 @@ class HomeViewModelTest {
                 )
             ).thenReturn(result)
         }
-        result.value = list
+        result.value = getDogDetailsObjectList()
 
         val data =
             viewModel.getLikedDogsByBreedNameAndSubBreed(breedName, subBreedName).getOrAwaitValue()
@@ -278,5 +228,5 @@ class HomeViewModelTest {
             .deleteDog(breedName, subBreedName, url)
 
     }
-    
+
 }

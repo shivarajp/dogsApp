@@ -1,6 +1,7 @@
 package com.shapegames.animals.views.home
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import com.shapegames.animals.data.local.Breeds
@@ -10,12 +11,16 @@ import com.shapegames.animals.data.models.DogsByBreedResponseModel
 import com.shapegames.animals.data.remote.Resource
 import com.shapegames.animals.data.repo.DogsRepositoryImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(private val repository: DogsRepositoryImpl) : ViewModel() {
 
+
+    val currentWeather = MutableLiveData<Resource<DogsByBreedResponseModel>>()
 
     /**
      * Fetch dogs from API by breed & subBreed and save them in local db
@@ -23,11 +28,12 @@ class HomeViewModel @Inject constructor(private val repository: DogsRepositoryIm
     fun fetchDogsBySubBreedFromApi(
         parentBreedId: String,
         subBreedId: String
-    ): LiveData<Resource<DogsByBreedResponseModel>> {
-        return liveData(Dispatchers.IO) {
-            emit(Resource.loading(null))
-            emit(repository.getDogsBySubBreed(parentBreedId, subBreedId))
+    ) {
+        CoroutineScope(Dispatchers.IO).launch {
+            currentWeather.postValue((Resource.loading(null)))
+            currentWeather.postValue(repository.getDogsBySubBreed(parentBreedId, subBreedId))
         }
+
     }
 
 
@@ -60,15 +66,18 @@ class HomeViewModel @Inject constructor(private val repository: DogsRepositoryIm
     /**
      * Fetches all breed dogs form the [dog_details] table
      */
-
     fun getAllLikedDogs(): LiveData<MutableList<DogDetails>> {
         return repository.getAllLikedDogs()
     }
 
+
     /**
      * Fetches dogs for specific breed/subreed the [dog_details] table
      */
-    fun getLikedDogsByBreedNameAndSubBreed(breedName: String, subBreedName: String): LiveData<MutableList<DogDetails>> {
+    fun getLikedDogsByBreedNameAndSubBreed(
+        breedName: String,
+        subBreedName: String
+    ): LiveData<MutableList<DogDetails>> {
         return repository.getLikedDogsByBreedNameAndSubBreed(breedName, subBreedName)
     }
 
@@ -76,7 +85,10 @@ class HomeViewModel @Inject constructor(private val repository: DogsRepositoryIm
     /**
      * Fetches all breed dogs image urls from [dog_details] table
      */
-    fun getAllDogsUrls(parentBreedName: String, subBreedName: String): LiveData<MutableList<String>> {
+    fun getAllDogsUrls(
+        parentBreedName: String,
+        subBreedName: String
+    ): LiveData<MutableList<String>> {
         return repository.getAllDogsUrls(parentBreedName, subBreedName)
     }
 

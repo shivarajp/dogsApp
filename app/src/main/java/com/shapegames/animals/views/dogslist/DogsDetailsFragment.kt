@@ -127,11 +127,7 @@ class DogsDetailsFragment : Fragment() {
 
     private fun fetchDogs() {
         if (subBreedName.isNotEmpty() || parentBreedName.isNotEmpty()) {
-            viewModel.fetchDogsBySubBreedFromApi(
-                parentBreedId = parentBreedName,
-                subBreedId = subBreedName
-            ).observe(viewLifecycleOwner, Observer {
-
+            viewModel.currentWeather.observe(viewLifecycleOwner, Observer {
                 when (it.status) {
                     Status.ERROR -> {
                         handleError()
@@ -140,13 +136,17 @@ class DogsDetailsFragment : Fragment() {
                         it?.data?.let {
                             handleSuccess(it)
                         }
-
                     }
                     Status.LOADING -> {
                         binding.progressBar.show()
                     }
                 }
             })
+
+            viewModel.fetchDogsBySubBreedFromApi(
+                parentBreedId = parentBreedName,
+                subBreedId = subBreedName
+            )
         }
     }
 

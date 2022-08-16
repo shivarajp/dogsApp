@@ -82,7 +82,6 @@ class LikedDogsFragment : Fragment() {
                     dogsList.addAll(it)
                     adapter.notifyDataSetChanged()
 
-
                     if (it.isEmpty()) {
                         binding.noDogsTv.show()
                     } else {

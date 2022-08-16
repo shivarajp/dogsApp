@@ -23,7 +23,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
-    val viewModel by viewModels<HomeViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -31,25 +30,6 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        //Save breeds in db
-        //viewModel.saveLocalBreedsListInDb()
-
-
-        /*val navController = findNavController(R.id.nav_host_fragment_content_main)
-        appBarConfiguration = AppBarConfiguration(navController.graph)
-        setupActionBarWithNavController(navController, appBarConfiguration)*/
-
-
-        //viewModel.fetchDogsByBreedFromApi("hound")
-        /*viewModel.fetchDogsBySubBreedFromApi("hound", "afghan")
-        viewModel.observeLocalDogsByBreedId(70).observe(this, Observer {
-            runOnUiThread {
-                it.forEach {
-                    println("datttaa ${it.dogUrl}")
-                }
-            }
-        })*/
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

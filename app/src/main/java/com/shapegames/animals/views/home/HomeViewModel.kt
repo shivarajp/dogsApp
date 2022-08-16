@@ -20,7 +20,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(private val repository: DogsRepositoryImpl) : ViewModel() {
 
 
-    val currentWeather = MutableLiveData<Resource<DogsByBreedResponseModel>>()
+    val observeDogsApi = MutableLiveData<Resource<DogsByBreedResponseModel>>()
 
     /**
      * Fetch dogs from API by breed & subBreed and save them in local db
@@ -30,10 +30,9 @@ class HomeViewModel @Inject constructor(private val repository: DogsRepositoryIm
         subBreedId: String
     ) {
         CoroutineScope(Dispatchers.IO).launch {
-            currentWeather.postValue((Resource.loading(null)))
-            currentWeather.postValue(repository.getDogsBySubBreed(parentBreedId, subBreedId))
+            observeDogsApi.postValue((Resource.loading(null)))
+            observeDogsApi.postValue(repository.getDogsBySubBreed(parentBreedId, subBreedId))
         }
-
     }
 
 

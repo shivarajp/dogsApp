@@ -123,7 +123,7 @@ class DogsRepositoryImpl
     }
 
     /**
-     * Update the dog row with like/unlike status based on user action
+     * Insert liked dog in db
      */
     fun insertLikedDog(
         dogDetail: DogDetails
@@ -142,7 +142,7 @@ class DogsRepositoryImpl
         }
     }
 
-   /**
+    /**
      * Fetch all liked dogs from db
      */
     fun getAllLikedDogs(): LiveData<MutableList<DogDetails>> {
@@ -152,7 +152,10 @@ class DogsRepositoryImpl
     /**
      * Fetch liked dogs of a specific breed
      */
-    fun getLikedDogsByBreedNameAndSubBreed(breedName: String, subBreedName: String): LiveData<MutableList<DogDetails>> {
+    fun getLikedDogsByBreedNameAndSubBreed(
+        breedName: String,
+        subBreedName: String
+    ): LiveData<MutableList<DogDetails>> {
         return dao.getLikedDogsByBreedNameAndSubBreed(breedName, subBreedName)
     }
 
@@ -171,7 +174,10 @@ class DogsRepositoryImpl
     /**
      * Fetch liked dogs of a specific breed
      */
-    fun getAllDogsUrls(parentBreedName: String, subBreedName: String): LiveData<MutableList<String>> {
+    fun getAllDogsUrls(
+        parentBreedName: String,
+        subBreedName: String
+    ): LiveData<MutableList<String>> {
         return dao.getAllDogsUrls(parentBreedName, subBreedName)
     }
 

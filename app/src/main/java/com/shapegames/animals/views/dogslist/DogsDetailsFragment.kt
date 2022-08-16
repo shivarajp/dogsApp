@@ -127,7 +127,7 @@ class DogsDetailsFragment : Fragment() {
 
     private fun fetchDogs() {
         if (subBreedName.isNotEmpty() || parentBreedName.isNotEmpty()) {
-            viewModel.currentWeather.observe(viewLifecycleOwner, Observer {
+            viewModel.observeDogsApi.observe(viewLifecycleOwner, Observer {
                 when (it.status) {
                     Status.ERROR -> {
                         handleError()

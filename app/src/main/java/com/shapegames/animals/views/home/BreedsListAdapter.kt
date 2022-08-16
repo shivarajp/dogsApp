@@ -32,14 +32,6 @@ class BreedsListAdapter(private val list: MutableList<Breeds>) :
             }
         }
 
-        /*holder.itemView.setOnClickListener {
-            itemClick?.invoke(list[position])
-        }
-
-        holder.viewItem.breedDogContainer.setOnClickListener {
-            itemClick?.invoke(list[position])
-        }*/
-
         holder.viewItem.view1.setOnClickListener {
             itemClick?.invoke(list[position])
         }

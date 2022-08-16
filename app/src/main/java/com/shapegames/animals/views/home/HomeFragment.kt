@@ -14,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.shapegames.animals.R
 import com.shapegames.animals.data.local.Breeds
+import com.shapegames.animals.data.models.AllBreedsNameListResponsModel
 import com.shapegames.animals.data.remote.Status
 import com.shapegames.animals.databinding.HomeFragmentBinding
 import com.shapegames.animals.utils.Util.BREED_GRID_COUNT
@@ -62,9 +63,9 @@ class HomeFragment : Fragment() {
 
         adapter.itemClick = {
             //go to details fragment with breed
-            // and sub_breed id of clicked item
+            // and sub_breed name of selected breed
             val action = HomeFragmentDirections
-                .actionFirstFragmentToSecondFragment(it.parentId, it.breedId)
+                .actionFirstFragmentToSecondFragment(it.breedName, it.subBreedName)
             findNavController().navigate(action)
         }
 
@@ -75,8 +76,8 @@ class HomeFragment : Fragment() {
         }
     }
 
+
     private fun setUpViews() {
-        //adapter = BreedsListAdapter(breedsList)
         binding.breedsRv.layoutManager = GridLayoutManager(requireActivity(), BREED_GRID_COUNT)
     }
 

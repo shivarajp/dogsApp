@@ -11,12 +11,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
+import com.shapegames.animals.data.local.DogDetails
 import com.shapegames.animals.data.local.DogsBreedModel
+import com.shapegames.animals.data.models.DogsByBreedResponseModel
 import com.shapegames.animals.data.remote.Status
 import com.shapegames.animals.databinding.DogDetailsFragmentBinding
 import com.shapegames.animals.utils.Util.GRID_COUNT
 import com.shapegames.animals.utils.Util.LIKED
-import com.shapegames.animals.utils.Util.MINIMUM_ID
 import com.shapegames.animals.utils.Util.UNLIKED
 import com.shapegames.animals.utils.hide
 import com.shapegames.animals.utils.show
@@ -39,8 +40,8 @@ class DogsDetailsFragment : Fragment() {
     private val dogsList = mutableListOf<DogsBreedModel>()
     private lateinit var adapter: DogsListAdapter
 
-    private var parentBreedId: Long? = null
-    private var subBreedId: Long? = null
+    private lateinit var parentBreedName: String
+    private lateinit var subBreedName: String
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,8 +50,8 @@ class DogsDetailsFragment : Fragment() {
 
         _binding = DogDetailsFragmentBinding.inflate(inflater, container, false)
 
-        parentBreedId = args.breedId
-        subBreedId = args.subBreedId
+        parentBreedName = args.breedId
+        subBreedName = args.subBreedId
 
         return binding.root
 
@@ -59,61 +60,87 @@ class DogsDetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         init()
-        observeDogs()
+
         fetchDogs()
     }
 
-    private fun observeDogs() {
-        if (subBreedId!! > MINIMUM_ID) {
-            //Its a sub breed
-            viewModel.observeLocalDogsAndBreedByBreedId(subBreedId!!)
-                .observe(viewLifecycleOwner, Observer { list ->
-                    dogsList.addAll(list)
-                    adapter.notifyDataSetChanged()
-                })
-        } else {
-            //Its a parent breed
-            viewModel.observeLocalDogsAndBreedByBreedId(parentBreedId!!)
-                .observe(viewLifecycleOwner, Observer {
-                    dogsList.addAll(it)
-                    adapter.notifyDataSetChanged()
-                })
-        }
 
-        adapter = DogsListAdapter(dogsList)
+    private fun handleSuccess(dogsByBreedResponseModel: DogsByBreedResponseModel) {
+
+        adapter = DogsListAdapter(dogsList, parentBreedName, subBreedName)
         binding.dogsRv.adapter = adapter
 
-        adapter.itemClick = { dog: DogsBreedModel, position: Int ->
+        viewModel.getAllDogsUrls(parentBreedName, subBreedName)
+            .observe(viewLifecycleOwner, Observer { it ->
+                if (it.isNotEmpty()) {
+
+                    var liked = dogsByBreedResponseModel.message.intersect(it.toSet()).toList()
+                    val notLiked = dogsByBreedResponseModel.message.minus(liked.toSet())
+
+                    liked.forEach { url ->
+                        dogsList.add(DogsBreedModel(dogUrl = url, isLiked = true))
+                    }
+
+                    notLiked.forEach { url ->
+                        dogsList.add(DogsBreedModel(dogUrl = url, isLiked = false))
+                    }
+                } else {
+                    dogsByBreedResponseModel.message.forEach {
+                        dogsList.add(DogsBreedModel(dogUrl = it, isLiked = false))
+                    }
+                }
+                adapter.notifyDataSetChanged()
+
+            })
+
+        binding.progressBar.hide()
+        //dogsList.addAll(dogsByBreedResponseModel.message)
+        //adapter.notifyDataSetChanged()
+        adapter.itemClick = { dog: DogsBreedModel, parentBreedName: String,
+                              subBreedName: String, position: Int ->
             //User liked/unliked the photo
             if (!dog.isLiked) {
                 dog.isLiked = LIKED
+                val dogDetail = DogDetails(
+                    dogUrl = dog.dogUrl,
+                    breedName = parentBreedName,
+                    subBreed = subBreedName,
+                    isLiked = dog.isLiked
+                )
+
+                viewModel.insertLikedDog(dogDetail)
+                    .observe(viewLifecycleOwner, Observer {
+                        lifecycleScope.launch {
+                            dogsList[position] = dog
+                            adapter.notifyItemChanged(position)
+                        }
+                    })
             } else {
                 dog.isLiked = UNLIKED
+                viewModel.deleteDog(parentBreedName, subBreedName, dog.dogUrl)
+                dogsList[position] = dog
+                adapter.notifyItemChanged(position)
             }
-            viewModel.updateLikeStatus(dog).observe(viewLifecycleOwner, Observer {
-                lifecycleScope.launch {
-                    dogsList[position] = dog
-                    adapter.notifyItemChanged(position)
-                }
-            })
         }
     }
 
 
     private fun fetchDogs() {
-        if (subBreedId!! > MINIMUM_ID || parentBreedId!! > MINIMUM_ID) {
+        if (subBreedName.isNotEmpty() || parentBreedName.isNotEmpty()) {
             viewModel.fetchDogsBySubBreedFromApi(
-                parentBreedId = parentBreedId!!,
-                subBreedId = subBreedId!!
+                parentBreedId = parentBreedName,
+                subBreedId = subBreedName
             ).observe(viewLifecycleOwner, Observer {
 
                 when (it.status) {
                     Status.ERROR -> {
-                        binding.progressBar.hide()
-                        requireActivity().toast("Something went wrong")
+                        handleError()
                     }
                     Status.SUCCESS -> {
-                        binding.progressBar.hide()
+                        it?.data?.let {
+                            handleSuccess(it)
+                        }
+
                     }
                     Status.LOADING -> {
                         binding.progressBar.show()
@@ -122,6 +149,12 @@ class DogsDetailsFragment : Fragment() {
             })
         }
     }
+
+    fun handleError() {
+        binding.progressBar.hide()
+        requireActivity().toast("Something went wrong")
+    }
+
 
     private fun init() {
         binding.backIv.setOnClickListener {
@@ -135,7 +168,7 @@ class DogsDetailsFragment : Fragment() {
         }
 
         binding.dogsRv.layoutManager = GridLayoutManager(requireActivity(), GRID_COUNT)
-        adapter = DogsListAdapter(dogsList)
+        adapter = DogsListAdapter(dogsList, parentBreedName, subBreedName)
     }
 
 

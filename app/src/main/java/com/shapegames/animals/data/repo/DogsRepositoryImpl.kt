@@ -5,14 +5,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import com.shapegames.animals.data.local.Breeds
 import com.shapegames.animals.data.local.DogDetails
-import com.shapegames.animals.data.local.DogsBreedModel
 import com.shapegames.animals.data.local.DogsDao
+import com.shapegames.animals.data.models.AllBreedsNameListResponsModel
+import com.shapegames.animals.data.models.DogsByBreedResponseModel
 import com.shapegames.animals.data.remote.DogsAPI
 import com.shapegames.animals.data.remote.Resource
 import com.shapegames.animals.data.remote.ResponseHandler
-import com.shapegames.animals.utils.Util
 import com.shapegames.animals.utils.Util.IMG_COUNT
-import com.shapegames.animals.utils.Util.UNLIKED
 import com.shapegames.animals.utils.Util.dogsBreedsHashMap
 import com.shapegames.animals.utils.Util.imageUrls
 import kotlinx.coroutines.CoroutineScope
@@ -32,89 +31,30 @@ class DogsRepositoryImpl
      * Fetch dogs list form API both parent and sub breed
      *
      */
-    fun getDogsBySubBreed(
-        parentBreedId: Long,
-        subBreedId: Long
-    ): LiveData<Resource<String>> {
+    suspend fun getDogsBySubBreed(
+        parentBreedName: String,
+        subBreedName: String
+    ): Resource<DogsByBreedResponseModel> {
 
-        return liveData(Dispatchers.IO) {
-            try {
-                emit(Resource.loading(null))
-                //Check if these images are already in db
-                if (parentBreedId == 0L) {
+        try {
+            if (subBreedName.isNotEmpty()) {
+                //get sub breed dogs
+                val res = api.getDogsBySubBreedFromApi(
+                    parentBreedName,
+                    subBreedName
+                )
+                return responseHandler.handleSuccess(res)
 
-                    //No parent breed so Fetch dogs with the sub breed
-                    if (dao.isThisBreedImagesAreInDB(subBreedId) <= 0) {
-                        val breedName = dao.getBreedNameById(subBreedId)
-
-                        val res = api.getDogsByBreedFromApi(breedName, IMG_COUNT)
-                        when (res.status) {
-                            "success" -> {
-                                saveDogsByBreedInDB(subBreedId, res.message)
-                                emit(responseHandler.handleSuccess("success"))
-                            }
-
-                            "error" -> {
-                                emit(responseHandler.handleSuccess("error"))
-                            }
-                        }
-                    } else {
-                        emit(responseHandler.handleSuccess("success"))
-                    }
-
-                } else if (dao.isThisBreedImagesAreInDB(subBreedId) <= 0) {
-
-                    /**
-                     * It has a parent breed and subBreedId both
-                     * In API call use both parent and subBreed
-                     */
-                    val res = api.getDogsBySubBreedFromApi(
-                        dao.getBreedNameById(parentBreedId),
-                        dao.getBreedNameById(subBreedId)
-                    )
-                    when (res.status) {
-                        "success" -> {
-                            saveDogsByBreedInDB(subBreedId, res.message)
-                            emit(responseHandler.handleSuccess("success"))
-                        }
-
-                        "error" -> {
-                            emit(responseHandler.handleSuccess("error"))
-                        }
-                    }
-                } else {
-                    emit(responseHandler.handleSuccess("success"))
-                }
-            } catch (e: Exception) {
-                emit(responseHandler.handleException(e))
-                Log.d("error", e.message.toString())
+            } else {
+                //get parent breed only dogs
+                val res = api.getDogsByBreedFromApi(
+                    parentBreedName,
+                    IMG_COUNT
+                )
+                return responseHandler.handleSuccess(res)
             }
-
-        }
-    }
-
-
-    /**
-     * Using breedId fetch Dog details & breed name from db
-     */
-    fun observeLocalDogsAndBreedByBreedId(breedId: Long): LiveData<MutableList<DogsBreedModel>> {
-        return dao.getAllDogsWithBreedByBreedId(breedId)
-    }
-
-    /**
-     * Insert dogs data in local Dog db
-     */
-    private fun saveDogsByBreedInDB(breedId: Long, dogImages: List<String>) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                for (index in dogImages.indices) {
-                    val dogDetailsModel =
-                        DogDetails(dogUrl = dogImages[index], breedId = breedId, isLiked = UNLIKED)
-                    dao.insertSingleDogByBreed(dogDetailsModel)
-                }
-            } catch (exception: Exception) {
-                Log.d("error", exception.message.toString())
-            }
+        } catch (e: Exception) {
+            return responseHandler.handleException(e)
         }
     }
 
@@ -124,37 +64,16 @@ class DogsRepositoryImpl
      * if not then it stores it in Breeds table
      */
     fun saveLocalBreedsInDB(): LiveData<Resource<String>> {
+
         return liveData(Dispatchers.IO) {
             try {
                 val rand = Random()
-
                 emit(Resource.loading(null))
 
                 if (dao.getAllBreedNamesCount() <= 0) {
                     dogsBreedsHashMap.keys.forEachIndexed { index, key ->
                         saveBreedWithImg(key, imageUrls[rand.nextInt(10)])
                         emit(responseHandler.handleSuccess("$index"))
-
-                        /**
-                         * We can fetch a random image for each breed
-                         * to load in the breed list for better user experience.
-                         * As of now keeping it simple with static image.
-                         */
-
-                        /*val res = api.getDogsByBreedFromApi(key, "1")
-
-                        when (res.status) {
-                            "success" -> {
-                                if (res.message.isNotEmpty()) {
-                                    saveBreedWithImg(key, res.message[0])
-                                    emit(responseHandler.handleSuccess("$index"))
-                                }
-                            }
-
-                            "error" -> {
-
-                            }
-                        }*/
                     }
                     emit(responseHandler.handleSuccess("success"))
                 } else {
@@ -165,35 +84,31 @@ class DogsRepositoryImpl
                 Log.d("error", e.message.toString())
             }
         }
-
     }
 
     /**
      * Go through local breed map and stores it in db with a dog image
      */
     private fun saveBreedWithImg(breedName: String, img_url: String) {
-        var url = img_url
-        if (img_url.isEmpty()) {
-            //default place holder image
-            url = "https://images.dog.ceo/breeds/mountain-swiss/n02107574_1033.jpg"
-        }
 
-        //Save parent breed
-        val parentId = dao.insetBreed(
-            Breeds(
-                breedName = breedName,
-                parentId = 0,
-                imgUrl = url
-            )
-        )
-
-        //Save Sub breed if any
-        dogsBreedsHashMap[breedName]?.forEach {
+        //save both breed and sub breed
+        if (!dogsBreedsHashMap[breedName].isNullOrEmpty()) {
+            dogsBreedsHashMap[breedName]?.forEach {
+                dao.insetBreed(
+                    Breeds(
+                        breedName = breedName,
+                        subBreedName = it,
+                        imgUrl = img_url
+                    )
+                )
+            }
+        } else {
+            //Save parent breed
             dao.insetBreed(
                 Breeds(
-                    breedName = it,
-                    parentId = parentId,
-                    imgUrl = url
+                    breedName = breedName,
+                    subBreedName = "",
+                    imgUrl = img_url
                 )
             )
         }
@@ -210,17 +125,13 @@ class DogsRepositoryImpl
     /**
      * Update the dog row with like/unlike status based on user action
      */
-    fun updateLikeStatus(dog: DogsBreedModel): LiveData<String> {
+    fun insertLikedDog(
+        dogDetail: DogDetails
+    ): LiveData<String> {
         return liveData(Dispatchers.IO) {
             try {
-                val dogDetailsModel = DogDetails(
-                    dogId = dog.dogId,
-                    dogUrl = dog.dogUrl,
-                    isLiked = dog.isLiked,
-                    breedId = dog.breedId
-                )
-                val id = dao.updateLikeStatus(dogDetailsModel)
-                if (id > 0) {
+                val id = dao.insertLikedDog(dogDetail)
+                if (id > 0L) {
                     emit("Updated")
                 } else {
                     emit("Update failed")
@@ -231,17 +142,47 @@ class DogsRepositoryImpl
         }
     }
 
-    /**
+   /**
      * Fetch all liked dogs from db
      */
-    fun getAllLikedDogs(): LiveData<MutableList<DogsBreedModel>> {
+    fun getAllLikedDogs(): LiveData<MutableList<DogDetails>> {
         return dao.getAllLikedDogsFromDb()
     }
 
     /**
      * Fetch liked dogs of a specific breed
      */
-    fun getLikedDogsByBreedId(breedId: Long): LiveData<MutableList<DogsBreedModel>> {
-        return dao.getLikedDogsByBreedId(breedId)
+    fun getLikedDogsByBreedNameAndSubBreed(breedName: String, subBreedName: String): LiveData<MutableList<DogDetails>> {
+        return dao.getLikedDogsByBreedNameAndSubBreed(breedName, subBreedName)
     }
+
+
+    /**
+     * Gets all breeds from api
+     */
+    suspend fun getAllBreedsFromApi(): Resource<AllBreedsNameListResponsModel> {
+        return try {
+            responseHandler.handleSuccess(api.getAllBreedNamesFromApi())
+        } catch (e: Exception) {
+            responseHandler.handleException(e)
+        }
+    }
+
+    /**
+     * Fetch liked dogs of a specific breed
+     */
+    fun getAllDogsUrls(parentBreedName: String, subBreedName: String): LiveData<MutableList<String>> {
+        return dao.getAllDogsUrls(parentBreedName, subBreedName)
+    }
+
+    /**
+     * Delete a dog from table
+     */
+    fun deleteDog(parentBreedName: String, subBreedName: String, dogUrl: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            dao.deleteDog(parentBreedName, subBreedName, dogUrl)
+        }
+    }
+
+
 }

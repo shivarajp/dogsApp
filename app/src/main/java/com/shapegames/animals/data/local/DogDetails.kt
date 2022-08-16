@@ -4,14 +4,7 @@ import androidx.room.*
 import androidx.room.ForeignKey.CASCADE
 
 @Entity(
-    tableName = "dog_details",
-    foreignKeys = [ForeignKey(
-        entity = Breeds::class,
-        parentColumns = arrayOf("breed_id"),
-        childColumns = arrayOf("breedid"),
-        onDelete = CASCADE
-    )],
-    indices = arrayOf(Index(value = arrayOf("breedid")))
+    tableName = "dog_details", indices = [Index(value = ["dog_url"], unique = true)]
 )
 class DogDetails(
     @ColumnInfo(name = "dog_id")
@@ -21,8 +14,11 @@ class DogDetails(
     @ColumnInfo(name = "dog_url")
     var dogUrl: String,
 
-    @ColumnInfo(name = "breedid")
-    var breedId: Long,
+    @ColumnInfo(name = "breed_name")
+    var breedName: String,
+
+    @ColumnInfo(name = "sub_breed")
+    var subBreed: String,
 
     @ColumnInfo(name = "is_liked")
     var isLiked: Boolean,

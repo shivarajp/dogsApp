@@ -1,13 +1,11 @@
 package com.shapegames.animals.data.local
 
-import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import junit.framework.TestCase
-import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -37,29 +35,17 @@ class DogsRoomDatabaseTest : TestCase() {
         database.close()
     }
 
-    @Test
-    fun test_insertBreedsTest() = kotlinx.coroutines.test.runTest {
-
-        val breed = Breeds(
-            breedName = "pug",
-            parentId = 0,
-            imgUrl = "https://github.com/"
-        )
-        dao.insetBreed(breed)
-        val name = dao.getBreedNameById(1)
-        assertThat(name).isEqualTo("pug")
-    }
 
     @Test
     fun test_getAllBreedNamesCount() = kotlinx.coroutines.test.runTest {
         val breed = Breeds(
-            breedName = "pug",
-            parentId = 0,
+            breedName = "australian",
+            subBreedName = "shepherd",
             imgUrl = "https://github.com/"
         )
         val breed2 = Breeds(
-            breedName = "pug",
-            parentId = 0,
+            breedName = "australian",
+            subBreedName = "shepherd",
             imgUrl = "https://github.com/"
         )
         dao.insetBreed(breed)
@@ -69,64 +55,20 @@ class DogsRoomDatabaseTest : TestCase() {
         assertThat(count).isEqualTo(2)
     }
 
-    @Test
-    fun test_getBreedIdByName() = kotlinx.coroutines.test.runTest {
-        val breed = Breeds(
-            breedId = 122,
-            breedName = "pug",
-            parentId = 0,
-            imgUrl = "https://github.com/"
-        )
-        dao.insetBreed(breed)
-        val id = dao.getBreedIdByName("pug")
-        assertThat(id).isEqualTo(122)
-    }
-
-    @Test
-    fun test_insertSingleDogByBreed() = kotlinx.coroutines.test.runTest {
-        val breed = Breeds(
-            breedId = 122,
-            breedName = "pug",
-            parentId = 0,
-            imgUrl = "https://github.com/"
-        )
-        val breedId = dao.insetBreed(breed)
-
-        val dog = DogDetails(
-            dogId = 111,
-            dogUrl = "https://github.com/",
-            isLiked = false,
-            breedId = breedId
-        )
-
-        dao.insertSingleDogByBreed(dog)
-
-        val res = DogsBreedModel(
-            dogId = 111,
-            dogUrl = "https://github.com/",
-            isLiked = false,
-            breedId = breed.breedId,
-            breedName = "pug"
-        )
-
-        val dogs = dao.getAllDogsWithBreedByBreedId(breedId).getOrAwaitValue()
-        assertThat(dogs).contains(res)
-    }
-
 
     @Test
     fun test_getAllBreedsAsLiveData() = kotlinx.coroutines.test.runTest {
         val breed = Breeds(
             breedId = 1223,
-            breedName = "pug",
-            parentId = 0,
+            breedName = "australian",
+            subBreedName = "shepherd",
             imgUrl = "https://github.com/"
         )
         val breed2 = Breeds(
             breedId = 321,
-            breedName = "pug",
-            parentId = 0,
-            imgUrl = "https://github.com/"
+            breedName = "australian",
+            subBreedName = "shepherd",
+            imgUrl = "https://github.com/2"
         )
         dao.insetBreed(breed)
         dao.insetBreed(breed2)
@@ -137,118 +79,78 @@ class DogsRoomDatabaseTest : TestCase() {
     }
 
     @Test
-    fun test_getBreedNameById() = kotlinx.coroutines.test.runTest {
-        val breed2 = Breeds(
-            breedId = 321,
-            breedName = "pug",
-            parentId = 0,
-            imgUrl = "https://github.com/"
-        )
-        dao.insetBreed(breed2)
-
-
-        val name = dao.getBreedNameById(321)
-        assertThat(breed2.breedName).isEqualTo(name)
-    }
-
-    @Test
-    fun test_updateLikeStatus() = kotlinx.coroutines.test.runTest {
-        val breed2 = Breeds(
-            breedId = 321,
-            breedName = "pug",
-            parentId = 0,
-            imgUrl = "https://github.com/"
-        )
-        val breedId = dao.insetBreed(breed2)
-
-        val dog = DogDetails(
-            dogId = 111,
-            dogUrl = "https://github.com/",
-            isLiked = false,
-            breedId = breedId
-        )
-        dao.insertSingleDogByBreed(dog)
-
-        dog.isLiked = true
-
-        dao.updateLikeStatus(dog)
-
-        val dogBreedModel =
-            DogsBreedModel(dog.dogId, dog.dogUrl, dog.breedId, dog.isLiked, breed2.breedName)
-
-        val updatedDogs = dao.getLikedDogsByBreedId(dog.breedId).getOrAwaitValue()
-
-        assertThat(updatedDogs).contains(dogBreedModel)
-
-    }
-
-    @Test
     fun test_getAllLikedDogsFromDb() = kotlinx.coroutines.test.runTest {
-        val breed2 = Breeds(
-            breedId = 321,
-            breedName = "pug",
-            parentId = 0,
-            imgUrl = "https://github.com/"
-        )
-        val breedId = dao.insetBreed(breed2)
 
         val dog = DogDetails(
-            dogId = 111,
+            dogId = 2323,
             dogUrl = "https://github.com/",
             isLiked = true,
-            breedId = breedId
+            breedName = "australian",
+            subBreed = "shepherd"
         )
         val dog2 = DogDetails(
-            dogId = 112,
-            dogUrl = "https://github.com/",
+            dogId = 4545,
+            dogUrl = "https://github.com/2",
             isLiked = true,
-            breedId = breedId
+            breedName = "australian",
+            subBreed = "pub"
         )
-        dao.insertSingleDogByBreed(dog)
-        dao.insertSingleDogByBreed(dog2)
-
-        val dogBreedModel = DogsBreedModel(dog.dogId, dog.dogUrl, dog.breedId, dog.isLiked, breed2.breedName)
-        val dogBreedModel2 = DogsBreedModel(dog2.dogId, dog2.dogUrl, dog2.breedId, dog2.isLiked, breed2.breedName)
+        dao.insertLikedDog(dog)
+        dao.insertLikedDog(dog2)
 
         val updatedDogs = dao.getAllLikedDogsFromDb().getOrAwaitValue()
 
-        assertThat(updatedDogs).contains(dogBreedModel)
-        assertThat(updatedDogs).contains(dogBreedModel2)
-
+        assertThat(updatedDogs[0].dogUrl).isEqualTo(dog.dogUrl)
+        assertThat(updatedDogs[1].dogUrl).isEqualTo(dog2.dogUrl)
     }
 
     @Test
-    fun test_getLikedDogsByBreedId() = kotlinx.coroutines.test.runTest {
-        val breed2 = Breeds(
-            breedId = 321,
-            breedName = "pug",
-            parentId = 0,
-            imgUrl = "https://github.com/"
-        )
-        val breedId = dao.insetBreed(breed2)
+    fun test_getAllLikedDogsFromDbByBreeds() = kotlinx.coroutines.test.runTest {
 
         val dog = DogDetails(
-            dogId = 111,
+            dogId = 2323,
             dogUrl = "https://github.com/",
             isLiked = true,
-            breedId = breedId
+            breedName = "australian",
+            subBreed = "shepherd"
         )
         val dog2 = DogDetails(
-            dogId = 112,
+            dogId = 4545,
+            dogUrl = "https://github.com/2",
+            isLiked = true,
+            breedName = "australian",
+            subBreed = "shepherd"
+        )
+        dao.insertLikedDog(dog)
+        dao.insertLikedDog(dog2)
+
+        val updatedDogs = dao.getAllDogsUrls("australian", "shepherd").getOrAwaitValue()
+
+        assertThat(updatedDogs[0]).isEqualTo(dog.dogUrl)
+        assertThat(updatedDogs[1]).isEqualTo(dog2.dogUrl)
+    }
+
+    @Test
+    fun test_delete_dog() = kotlinx.coroutines.test.runTest {
+
+        val dog = DogDetails(
+            dogId = 2323,
             dogUrl = "https://github.com/",
             isLiked = true,
-            breedId = breedId
+            breedName = "australian",
+            subBreed = "shepherd"
         )
-        dao.insertSingleDogByBreed(dog)
-        dao.insertSingleDogByBreed(dog2)
 
-        val dogBreedModel = DogsBreedModel(dog.dogId, dog.dogUrl, dog.breedId, dog.isLiked, breed2.breedName)
-        val dogBreedModel2 = DogsBreedModel(dog2.dogId, dog2.dogUrl, dog2.breedId, dog2.isLiked, breed2.breedName)
+        dao.insertLikedDog(dog)
 
-        val updatedDogs = dao.getLikedDogsByBreedId(breedId).getOrAwaitValue()
+        val updatedDogs = dao.getAllDogsUrls("australian", "shepherd").getOrAwaitValue()
+        assertThat(updatedDogs.size).isGreaterThan(0)
 
-        assertThat(updatedDogs).contains(dogBreedModel)
-        assertThat(updatedDogs).contains(dogBreedModel2)
+        dao.deleteDog("australian",
+            "shepherd", "https://github.com/")
+        val updatedDogs2 = dao.getAllDogsUrls("australian", "shepherd").getOrAwaitValue()
 
+        assertThat(updatedDogs2.size).isEqualTo(0)
     }
+
 }

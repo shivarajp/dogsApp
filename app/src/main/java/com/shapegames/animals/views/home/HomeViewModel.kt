@@ -3,35 +3,33 @@ package com.shapegames.animals.views.home
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
-import androidx.lifecycle.viewModelScope
 import com.shapegames.animals.data.local.Breeds
 import com.shapegames.animals.data.local.DogDetails
-import com.shapegames.animals.data.local.DogsBreedModel
+import com.shapegames.animals.data.models.AllBreedsNameListResponsModel
+import com.shapegames.animals.data.models.DogsByBreedResponseModel
 import com.shapegames.animals.data.remote.Resource
 import com.shapegames.animals.data.repo.DogsRepositoryImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(private val repository: DogsRepositoryImpl) : ViewModel() {
 
+
     /**
      * Fetch dogs from API by breed & subBreed and save them in local db
      */
     fun fetchDogsBySubBreedFromApi(
-        parentBreedId: Long,
-        subBreedId: Long
-    ): LiveData<Resource<String>> {
-        return repository.getDogsBySubBreed(parentBreedId, subBreedId)
+        parentBreedId: String,
+        subBreedId: String
+    ): LiveData<Resource<DogsByBreedResponseModel>> {
+        return liveData(Dispatchers.IO) {
+            emit(Resource.loading(null))
+            emit(repository.getDogsBySubBreed(parentBreedId, subBreedId))
+        }
     }
 
-    /**
-     * Fetch dogs with breed name from db with breedId
-     */
-    fun observeLocalDogsAndBreedByBreedId(breedId: Long): LiveData<MutableList<DogsBreedModel>> {
-        return repository.observeLocalDogsAndBreedByBreedId(breedId)
-    }
 
     /**
      * Save locally available breed names in db
@@ -50,18 +48,54 @@ class HomeViewModel @Inject constructor(private val repository: DogsRepositoryIm
 
 
     /**
-     * Update the like/unlike status for a dog
+     * Insert the liked dog into local db
      */
-    fun updateLikeStatus(dog: DogsBreedModel): LiveData<String> {
-        return repository.updateLikeStatus(dog)
+    fun insertLikedDog(
+        dogDetail: DogDetails
+    ): LiveData<String> {
+        return repository.insertLikedDog(dogDetail)
     }
 
-    fun getAllLikedDogs(): LiveData<MutableList<DogsBreedModel>> {
+
+    /**
+     * Fetches all breed dogs form the [dog_details] table
+     */
+
+    fun getAllLikedDogs(): LiveData<MutableList<DogDetails>> {
         return repository.getAllLikedDogs()
     }
 
-    fun getLikedDogsByBreedId(breedId: Long): LiveData<MutableList<DogsBreedModel>> {
-        return repository.getLikedDogsByBreedId(breedId)
+    /**
+     * Fetches dogs for specific breed/subreed the [dog_details] table
+     */
+    fun getLikedDogsByBreedNameAndSubBreed(breedName: String, subBreedName: String): LiveData<MutableList<DogDetails>> {
+        return repository.getLikedDogsByBreedNameAndSubBreed(breedName, subBreedName)
+    }
+
+
+    /**
+     * Fetches all breed dogs image urls from [dog_details] table
+     */
+    fun getAllDogsUrls(parentBreedName: String, subBreedName: String): LiveData<MutableList<String>> {
+        return repository.getAllDogsUrls(parentBreedName, subBreedName)
+    }
+
+    /**
+     * Deletes a dog from the table based on breed and url
+     * because we are not having these ids for remote dogs
+     */
+    fun deleteDog(parentBreedName: String, subBreedName: String, dogUrl: String) {
+        repository.deleteDog(parentBreedName, subBreedName, dogUrl)
+    }
+
+    /**
+     * Fetches breeds from the api
+     */
+    fun getBreedsFromApi(): LiveData<Resource<AllBreedsNameListResponsModel>> {
+        return liveData(Dispatchers.IO) {
+            emit(Resource.loading(null))
+            emit(repository.getAllBreedsFromApi())
+        }
     }
 
 }

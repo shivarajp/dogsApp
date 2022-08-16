@@ -13,11 +13,13 @@ import com.shapegames.animals.databinding.DogsRowItemBinding
 import com.shapegames.animals.utils.load
 
 class DogsListAdapter(
-    private val list: MutableList<DogsBreedModel>
+    private val list: MutableList<DogsBreedModel>,
+    private val parentBreedName: String,
+    private val subBreedName: String
 ) :
     RecyclerView.Adapter<DogsViewHolder>() {
 
-    var itemClick: ((DogsBreedModel, Int) -> Unit)? = null
+    var itemClick: ((DogsBreedModel, String, String, Int) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DogsViewHolder {
         return DogsViewHolder(
@@ -32,25 +34,18 @@ class DogsListAdapter(
     override fun onBindViewHolder(holder: DogsViewHolder, position: Int) {
         with(holder.viewItem) {
             with(list[position]) {
-                title.text = "$breedName"
+                title.text = "$parentBreedName $subBreedName"
+                imageView.load(this.dogUrl)
                 if (isLiked) {
                     likeIv.load(R.drawable.heart_filled)
-                    /*Glide.with(likeIv.context).load(R.drawable.heart_filled)
-                        .apply(RequestOptions().centerCrop()).into(likeIv)*/
                 } else {
                     likeIv.load(R.drawable.heart_empty)
-                    /*Glide.with(likeIv.context).load(R.drawable.heart_empty)
-                        .apply(RequestOptions().centerCrop()).into(likeIv)*/
                 }
-                imageView.load(this.dogUrl)
-
-                /*Glide.with(imageView.context).load(this.dogUrl).apply(RequestOptions().centerCrop())
-                    .into(imageView)*/
             }
         }
 
         holder.viewItem.imageView.setOnClickListener {
-            itemClick?.invoke(list[position], position)
+            itemClick?.invoke(list[position], parentBreedName, subBreedName, position)
         }
     }
 

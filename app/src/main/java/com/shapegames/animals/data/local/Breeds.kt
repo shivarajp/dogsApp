@@ -13,8 +13,8 @@ data class Breeds(
     @ColumnInfo(name = "breed_name")
     var breedName: String,
 
-    @ColumnInfo(name = "parent_id")
-    var parentId: Long,
+    @ColumnInfo(name = "sub_breed_name")
+    var subBreedName: String,
 
     @ColumnInfo(name = "img_url")
     var imgUrl: String

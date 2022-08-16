@@ -9,10 +9,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.shapegames.animals.data.local.Breeds
 import com.shapegames.animals.data.local.DogDetails
-import com.shapegames.animals.data.local.DogsBreedModel
 import com.shapegames.animals.databinding.FragmentLikedDogsBinding
 import com.shapegames.animals.utils.hide
 import com.shapegames.animals.utils.show
@@ -30,7 +28,7 @@ class LikedDogsFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel by viewModels<HomeViewModel>()
-    private val dogsList = mutableListOf<DogsBreedModel>()
+    private val dogsList = mutableListOf<DogDetails>()
     private val breedList = mutableListOf<Breeds>()
 
 
@@ -78,18 +76,19 @@ class LikedDogsFragment : Fragment() {
         breedAdapter.itemClick = { breed, poition ->
             binding.breedTitle.text = breed.breedName
 
-            viewModel.getLikedDogsByBreedId(breed.breedId).observe(viewLifecycleOwner, Observer {
-                dogsList.clear()
-                dogsList.addAll(it)
-                adapter.notifyDataSetChanged()
+            viewModel.getLikedDogsByBreedNameAndSubBreed(breed.breedName, breed.subBreedName)
+                .observe(viewLifecycleOwner, Observer {
+                    dogsList.clear()
+                    dogsList.addAll(it)
+                    adapter.notifyDataSetChanged()
 
 
-                if (it.isEmpty()) {
-                    binding.noDogsTv.show()
-                } else {
-                    binding.noDogsTv.hide()
-                }
-            })
+                    if (it.isEmpty()) {
+                        binding.noDogsTv.show()
+                    } else {
+                        binding.noDogsTv.hide()
+                    }
+                })
         }
     }
 

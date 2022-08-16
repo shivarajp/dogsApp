@@ -36,10 +36,10 @@
             />
         <argument
             android:name="breed_id"
-            app:argType="long" />
+            app:argType="string" />
         <argument
             android:name="sub_breed_id"
-            app:argType="long" />
+            app:argType="string" />
         <action
             android:id="@+id/action_SecondFragment_to_likedDogsFragment"
             app:destination="@id/likedDogsFragment" />

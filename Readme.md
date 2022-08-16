@@ -26,10 +26,7 @@
 </table>
 <table>
 <tr>
-    <td><img src="https://github.com/shivarajp/dogsApp/blob/master/art/Screenshot_20220817-011137.jpg" width="280" /></td> 
-    <td/>
-    <td><img src="https://github.com/shivarajp/dogsApp/blob/master/art/Screenshot_20220817-011158.jpg" width="280" /></td>
-
+    <td><img src="https://github.com/shivarajp/dogsApp/blob/master/art/Screenshot%202022-08-15%20at%205.42.28%20PM.png" width="280" /></td>
 </tr>
 </table>
 

@@ -29,7 +29,7 @@ class LikedDogsListAdapter(
     override fun onBindViewHolder(holder: DogsViewHolder, position: Int) {
         with(holder.viewItem) {
             with(list[position]) {
-                //title.text = "$breedName"
+                title.text = "$breedName"
                 if (isLiked) {
                     likeIv.load(R.drawable.heart_filled)
                 } else {

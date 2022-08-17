@@ -35,17 +35,11 @@ class DogsListAdapter(
                 title.text = "$breedName"
                 if (isLiked) {
                     likeIv.load(R.drawable.heart_filled)
-                    /*Glide.with(likeIv.context).load(R.drawable.heart_filled)
-                        .apply(RequestOptions().centerCrop()).into(likeIv)*/
                 } else {
                     likeIv.load(R.drawable.heart_empty)
-                    /*Glide.with(likeIv.context).load(R.drawable.heart_empty)
-                        .apply(RequestOptions().centerCrop()).into(likeIv)*/
+
                 }
                 imageView.load(this.dogUrl)
-
-                /*Glide.with(imageView.context).load(this.dogUrl).apply(RequestOptions().centerCrop())
-                    .into(imageView)*/
             }
         }
 

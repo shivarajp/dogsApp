@@ -76,7 +76,6 @@ class HomeFragment : Fragment() {
     }
 
     private fun setUpViews() {
-        //adapter = BreedsListAdapter(breedsList)
         binding.breedsRv.layoutManager = GridLayoutManager(requireActivity(), BREED_GRID_COUNT)
     }
 
